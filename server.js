@@ -3,7 +3,11 @@ const morgan = require("morgan");
 const { connectDatabase } = require("./config/db");
 require("dotenv").config();
 
+const logger = require("./utils/logger");
+
 const categoryRouter = require("./routes/category.router");
+const globalErrorHandler = require("./middlewares/globalErrorHandler");
+const NotFoundHandler = require("./middlewares/notFoundHandler");
 
 //express app
 const app = express();
@@ -13,19 +17,66 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(`Mode : ${process.env.NODE_ENV}`);
 }
+
 app.use(express.json());
+
 //routes
 app.use("/api/v1/categories", categoryRouter);
 
+// Error Handling
+app.use(NotFoundHandler);
+
+app.use(globalErrorHandler);
+
 const PORT = process.env.PORT || 8000;
+
+let server;
+
+process.on("uncaughtException", (err) => {
+  logger.fatal("uncaught_exception", {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  });
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+
+process.on("unhandledRejection", (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+
+  logger.fatal("unhandled_rejection", {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  });
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
 
 connectDatabase()
   .then(() => {
-    app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
       console.log(`app running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error(err);
+    logger.fatal("startup_error", {
+      message: err.message,
+      name: err.name,
+      stack: err.stack,
+    });
     process.exit(1);
   });
