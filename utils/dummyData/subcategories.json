@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439021",
+    "name": "Backpacks",
+    "slug": "backpacks",
+    "category": "507f1f77bcf86cd799439011"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439022",
+    "name": "Portable Storage",
+    "slug": "portable-storage",
+    "category": "507f1f77bcf86cd799439011"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439023",
+    "name": "T-Shirts",
+    "slug": "t-shirts",
+    "category": "507f1f77bcf86cd799439012"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439024",
+    "name": "Jackets",
+    "slug": "jackets",
+    "category": "507f1f77bcf86cd799439012"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439025",
+    "name": "Rings",
+    "slug": "rings",
+    "category": "507f1f77bcf86cd799439013"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439026",
+    "name": "Earrings",
+    "slug": "earrings",
+    "category": "507f1f77bcf86cd799439013"
+  }
+]

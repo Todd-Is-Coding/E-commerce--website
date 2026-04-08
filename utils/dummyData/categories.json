@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "Electronics",
+    "slug": "electronics",
+    "image": "https://fakestoreapi.com/img/electronics-category.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439012",
+    "name": "Clothing",
+    "slug": "clothing",
+    "image": "https://fakestoreapi.com/img/clothing-category.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439013",
+    "name": "Jewelry",
+    "slug": "jewelry",
+    "image": "https://fakestoreapi.com/img/jewelry-category.jpg"
+  }
+]

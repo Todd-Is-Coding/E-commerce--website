@@ -11,24 +11,20 @@ const productRouter = require('./routes/product.router');
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 const NotFoundHandler = require('./middlewares/notFoundHandler');
 
-//express app
 const app = express();
 
-//middlewares
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
-  console.log(`Mode : ${process.env.NODE_ENV}`);
+  logger.info(`Mode : ${process.env.NODE_ENV}`);
 }
 
 app.use(express.json());
 
-//routes
 app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/subcategories', subCategoryRouter);
 app.use('/api/v1/brands', brandRouter);
 app.use('/api/v1/products', productRouter);
 
-// Error Handling
 app.use(NotFoundHandler);
 
 app.use(globalErrorHandler);
@@ -74,7 +70,7 @@ process.on('unhandledRejection', (reason) => {
 connectDatabase()
   .then(() => {
     server = app.listen(PORT, () => {
-      console.log(`app running on port ${PORT}`);
+      logger.info(`app running on port ${PORT}`);
     });
   })
   .catch((err) => {

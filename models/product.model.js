@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const productSchema = mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -31,7 +31,7 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: [true, 'product must have a price'],
       trim: true,
-      maxLength: [20, 'too short price']
+      max: [20, 'too short price']
     },
     priceAfterDiscount: {
       type: Number

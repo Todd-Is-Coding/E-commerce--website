@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439001",
+    "name": "Fjallraven",
+    "slug": "fjallraven",
+    "image": "https://fakestoreapi.com/img/fjallraven-logo.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439002",
+    "name": "Nike",
+    "slug": "nike",
+    "image": "https://fakestoreapi.com/img/nike-logo.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439003",
+    "name": "John Hardy",
+    "slug": "john-hardy",
+    "image": "https://fakestoreapi.com/img/john-hardy-logo.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439004",
+    "name": "SanDisk",
+    "slug": "sandisk",
+    "image": "https://fakestoreapi.com/img/sandisk-logo.jpg"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439005",
+    "name": "Western Digital",
+    "slug": "western-digital",
+    "image": "https://fakestoreapi.com/img/western-digital-logo.jpg"
+  }
+]
