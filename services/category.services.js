@@ -4,17 +4,23 @@ const slugify = require('slugify');
 const httpStatus = require('../utils/httpStatus');
 const Category = require('../models/category.model');
 const AppError = require('../utils/appError');
+const ApiFeatures = require('../utils/apiFeatures');
 
 const getCategories = asyncHandler(async (req, res, next) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 6;
-  const skip = (page - 1) * limit;
-  const categories = await Category.find({}).skip(skip).limit(limit);
+  const apiFeatures = new ApiFeatures(Category.find(), req.query)
+    .filter()
+    .search()
+    .limitFields()
+    .sort();
+
+  await apiFeatures.paginate();
+
+  const { mongoQuery, paginationResult } = apiFeatures;
+  const categories = await mongoQuery;
 
   res.status(200).json({
     status: httpStatus.SUCCESS,
-    results: categories.length,
-    page: page,
+    paginationResult,
     data: categories
   });
 });

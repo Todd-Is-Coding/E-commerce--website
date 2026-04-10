@@ -5,6 +5,7 @@ const httpStatus = require('../utils/httpStatus');
 const SubCategory = require('../models/subcategory.model');
 const Category = require('../models/category.model');
 const AppError = require('../utils/appError');
+const ApiFeatures = require('../utils/apiFeatures');
 
 // for Nested Route
 const createFilterObj = (req, res, next) => {
@@ -61,19 +62,21 @@ const getSubCategoryById = asyncHandler(async (req, res, next) => {
 });
 
 const getAllSubCategories = asyncHandler(async (req, res, next) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
+  const queryWithFilter = req.filterObj ? SubCategory.find(req.filterObj) : SubCategory.find();
+  const apiFeatures = new ApiFeatures(queryWithFilter, req.query)
+    .filter()
+    .search()
+    .limitFields()
+    .sort();
 
-  const subCategories = await SubCategory.find(req.filterObj)
-    .skip(skip)
-    .limit(limit)
-    .populate('category');
+  await apiFeatures.paginate();
+
+  const { mongoQuery, paginationResult } = apiFeatures;
+  const subCategories = await mongoQuery.populate('category');
 
   res.status(200).json({
     status: httpStatus.SUCCESS,
-    results: subCategories.length,
-    page: page,
+    paginationResult,
     data: subCategories
   });
 });

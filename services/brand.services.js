@@ -4,19 +4,24 @@ const slugify = require('slugify');
 const Brand = require('../models/brand.model');
 const AppError = require('../utils/appError');
 const httpStatus = require('../utils/httpStatus');
+const ApiFeatures = require('../utils/apiFeatures');
 
 
 const getAllBrands = asyncHandler(async (req, res, next) => {
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 5;
-    const skip = (page - 1) * limit;
+    const apiFeatures = new ApiFeatures(Brand.find(), req.query)
+        .filter()
+        .search()
+        .limitFields()
+        .sort();
 
-    const brands = await Brand.find({}).skip(skip).limit(limit);
+    await apiFeatures.paginate();
+
+    const { mongoQuery, paginationResult } = apiFeatures;
+    const brands = await mongoQuery;
 
     res.status(200).json({
-        success: httpStatus.SUCCESS,
-        results: brands.length,
-        page: page,
+        status: httpStatus.SUCCESS,
+        paginationResult,
         data: brands,
     });
 });
