@@ -94,7 +94,7 @@ const createProductValidator = [
     .custom(async (subcategoryIds, { req }) => {
       if (!Array.isArray(subcategoryIds) || subcategoryIds.length === 0) return true;
 
-      const categoryId = req.body.categoryId;
+      const { categoryId } = req.body;
       if (!categoryId) return true; // Will be caught by categoryId validator
 
       // Single optimized query: Get subcategories that belong to the specified category

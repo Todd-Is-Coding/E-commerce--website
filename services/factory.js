@@ -3,7 +3,6 @@ const httpStatus = require('../utils/httpStatus');
 const asyncHandler = require('express-async-handler');
 const ApiFeatures = require('../utils/apiFeatures');
 
-
 const deleteOne = (Model, options = {}) => {
   const { modelName = 'document' } = options;
   return asyncHandler(async (req, res, next) => {
@@ -18,7 +17,6 @@ const deleteOne = (Model, options = {}) => {
     });
   });
 };
-
 
 const getOne = (Model, options = {}) => {
   const { modelName = 'document', populate = null } = options;
@@ -46,7 +44,6 @@ const getOne = (Model, options = {}) => {
     });
   });
 };
-
 
 const updateOne = (Model, options = {}) => {
   const { modelName = 'document', preProcess = null, populate = null } = options;
@@ -83,7 +80,6 @@ const updateOne = (Model, options = {}) => {
   });
 };
 
-
 const createOne = (Model, options = {}) => {
   const { preValidate = null, preProcess = null, populate = null } = options;
   return asyncHandler(async (req, res, next) => {
@@ -113,7 +109,6 @@ const createOne = (Model, options = {}) => {
     });
   });
 };
-
 
 const getAll = (Model, options = {}) => {
   const { modelName = '', populate = null } = options;

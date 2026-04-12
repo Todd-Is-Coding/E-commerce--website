@@ -1,4 +1,3 @@
-
 const SubCategory = require('../models/subcategory.model');
 const Category = require('../models/category.model');
 const AppError = require('../utils/appError');
