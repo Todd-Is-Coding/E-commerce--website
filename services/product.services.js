@@ -1,6 +1,8 @@
 const Product = require('../models/product.model');
 const { getOne, getAll, createOne, updateOne, deleteOne } = require('./factory');
-const { addSlugToProduct } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelpers');
+
+const addProductSlug = (data) => addSlug(data, 'title');
 
 const getAllProducts = getAll(Product, {
   modelName: 'Products',
@@ -13,13 +15,13 @@ const getProductById = getOne(Product, {
 });
 
 const createProduct = createOne(Product, {
-  preProcess: addSlugToProduct,
+  preProcess: addProductSlug,
   populate: ['category', 'subcategory']
 });
 
 const updateProduct = updateOne(Product, {
   modelName: 'Product',
-  preProcess: addSlugToProduct,
+  preProcess: addProductSlug,
   populate: ['category', 'subcategory']
 });
 

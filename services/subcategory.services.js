@@ -2,7 +2,7 @@ const SubCategory = require('../models/subcategory.model');
 const Category = require('../models/category.model');
 const AppError = require('../utils/appError');
 const { getOne, getAll, updateOne, deleteOne, createOne } = require('./factory');
-const { addSlugToSubCategory } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelpers');
 
 // Middleware for nested route
 const createFilterObj = (req, res, next) => {
@@ -31,17 +31,14 @@ const validateSubCategoryCreate = async (req, next) => {
   }
 };
 
-const prepareSubCategoryData = (data) => {
-  return {
-    name: data.name,
-    slug: addSlugToSubCategory({ name: data.name }).slug,
-    category: data.categoryId
-  };
+const processSubCategoryData = (data) => {
+  data.category = data.categoryId;
+  return addSlug(data);
 };
 
 const createSubCategory = createOne(SubCategory, {
   preValidate: validateSubCategoryCreate,
-  preProcess: prepareSubCategoryData,
+  preProcess: processSubCategoryData,
   populate: 'category'
 });
 
@@ -57,7 +54,7 @@ const getAllSubCategories = getAll(SubCategory, {
 
 const updateSubCategory = updateOne(SubCategory, {
   modelName: 'Subcategory',
-  preProcess: addSlugToSubCategory,
+  preProcess: processSubCategoryData,
   populate: 'category'
 });
 

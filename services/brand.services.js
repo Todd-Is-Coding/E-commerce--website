@@ -3,7 +3,7 @@ const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 
 const { getOne, getAll, updateOne, deleteOne, createOne } = require('./factory');
-const { addSlugToBrand } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelpers');
 const { uploadSingleImage } = require('../middlewares/uploadImage');
 const Brand = require('../models/brand.model');
 
@@ -30,12 +30,12 @@ const getBrandById = getOne(Brand, {
 });
 
 const createBrand = createOne(Brand, {
-  preProcess: addSlugToBrand
+  preProcess: addSlug
 });
 
 const updateBrand = updateOne(Brand, {
   modelName: 'Brand',
-  preProcess: addSlugToBrand
+  preProcess: addSlug
 });
 
 const deleteBrand = deleteOne(Brand, {

@@ -21,6 +21,23 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 ); // => creates createdAt , updatedAt
 
+const setImageURL = (doc) => {
+  if (doc.image) {
+    // eslint-disable-next-line no-param-reassign
+    doc.image = `${process.env.BASE_URL}/categories/${doc.image}`;
+  }
+};
+
+// findOne , findAll , update
+categorySchema.post('init', (doc) => {
+  setImageURL(doc);
+});
+
+// create
+categorySchema.post('save', (doc) => {
+  setImageURL(doc);
+});
+
 const categoryModel = mongoose.model('Category', categorySchema);
 
 module.exports = categoryModel;
