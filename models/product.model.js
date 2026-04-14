@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'product must have a price'],
       trim: true,
-      max: [20, 'too short price']
+      min: [0, 'price cannot be negative']
     },
     priceAfterDiscount: {
       type: Number
@@ -72,6 +72,20 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+const setImageURL = (doc) => {
+  if (doc.image) {
+    doc.image = `${process.env.BASE_URL}/products/${doc.image}`;
+  }
+};
+
+productSchema.post('init', (doc) => {
+  setImageURL(doc);
+});
+
+productSchema.post('save', (doc) => {
+  setImageURL(doc);
+});
 
 const productModel = mongoose.model('Product', productSchema);
 
