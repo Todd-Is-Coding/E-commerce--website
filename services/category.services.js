@@ -1,6 +1,6 @@
 const Category = require('../models/category.model');
 const { getOne, getAll, updateOne, deleteOne, createOne } = require('./factory');
-const { addSlug } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelper');
 
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');

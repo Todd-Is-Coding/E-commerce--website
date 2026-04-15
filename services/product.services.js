@@ -4,7 +4,7 @@ const asyncHandler = require('express-async-handler');
 
 const Product = require('../models/product.model');
 const { getOne, getAll, createOne, updateOne, deleteOne } = require('./factory');
-const { addSlug } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelper');
 const { uploadMixOfImages } = require('../middlewares/uploadImage');
 
 const processProductData = (data) => {

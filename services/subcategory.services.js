@@ -2,7 +2,7 @@ const SubCategory = require('../models/subcategory.model');
 const Category = require('../models/category.model');
 const AppError = require('../utils/appError');
 const { getOne, getAll, updateOne, deleteOne, createOne } = require('./factory');
-const { addSlug } = require('../utils/slugHelpers');
+const { addSlug } = require('../utils/slugHelper');
 
 // Middleware for nested route
 const createFilterObj = (req, res, next) => {
