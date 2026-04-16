@@ -6,6 +6,7 @@ const {
   updateUser,
   deleteUser,
   createUser,
+  changeUserPassword,
   resizeImage,
   uploadProfileImage
 } = require('../services/user.services');
@@ -18,6 +19,8 @@ const {
 } = require('../utils/validators/userValidators');
 
 const router = express.Router();
+
+router.route('/changePassword/:id').patch(changeUserPassword);
 
 router
   .route('/')
