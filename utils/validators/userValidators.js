@@ -72,10 +72,6 @@ const updateUserValidator = [
         }
       })
     ),
-  check('password')
-    .optional()
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
   check('role').optional().isIn(['user', 'admin']).withMessage('Role must be either user or admin'),
   check('phone').optional().isMobilePhone().withMessage('Invalid phone number'),
   check('profileImg').optional().isString().withMessage('Profile image must be a string'),
@@ -95,7 +91,6 @@ const changeUserPasswordValidator = [
     .notEmpty()
     .withMessage('You must enter a new password')
     .custom((newPassword, { req }) => {
-
       // short Note : val or newPassword → the value of the field you are validating
       // step 1 → find user in your db
       return User.findById(req.params.id).then((user) => {
