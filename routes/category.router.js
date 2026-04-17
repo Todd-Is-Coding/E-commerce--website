@@ -17,6 +17,8 @@ const {
   deleteCategoryValidator
 } = require('../utils/validators/categoryValidators');
 
+const verifyToken = require('../middlewares/verifyToken');
+
 const subCategoryRouter = require('./subcategory.router');
 
 const router = express.Router();
@@ -26,7 +28,7 @@ router.use('/:categoryId/subcategories', subCategoryRouter);
 router
   .route('/')
   .get(getCategories)
-  .post(uploadCategoryImage, resizeImage, createCategoryValidator, createCategory);
+  .post(verifyToken, uploadCategoryImage, resizeImage, createCategoryValidator, createCategory);
 
 router
   .route('/:id')
