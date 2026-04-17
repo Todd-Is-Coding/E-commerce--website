@@ -18,6 +18,7 @@ const {
 } = require('../utils/validators/categoryValidators');
 
 const verifyToken = require('../middlewares/verifyToken');
+const restrictedTo = require('../middlewares/restrictedTo');
 
 const subCategoryRouter = require('./subcategory.router');
 
@@ -28,12 +29,26 @@ router.use('/:categoryId/subcategories', subCategoryRouter);
 router
   .route('/')
   .get(getCategories)
-  .post(verifyToken, uploadCategoryImage, resizeImage, createCategoryValidator, createCategory);
+  .post(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    uploadCategoryImage,
+    resizeImage,
+    createCategoryValidator,
+    createCategory
+  );
 
 router
   .route('/:id')
   .get(getCategoryValidator, getCategoryById)
-  .patch(uploadCategoryImage, resizeImage, updateCategoryValidator, updateCategory)
-  .delete(deleteCategoryValidator, deleteCategory);
+  .patch(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    uploadCategoryImage,
+    resizeImage,
+    updateCategoryValidator,
+    updateCategory
+  )
+  .delete(verifyToken, restrictedTo('admin'), deleteCategoryValidator, deleteCategory);
 
 module.exports = router;

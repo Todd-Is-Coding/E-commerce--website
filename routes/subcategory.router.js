@@ -1,7 +1,5 @@
 const express = require('express');
 
-const router = express.Router({ mergeParams: true });
-
 const {
   createSubCategory,
   getSubCategoryById,
@@ -18,15 +16,30 @@ const {
   deleteSubCategoryValidator
 } = require('../utils/validators/subcategoryValidators');
 
+const verifyToken = require('../middlewares/verifyToken');
+const restrictedTo = require('../middlewares/restrictedTo');
+
+const router = express.Router({ mergeParams: true });
+
 router
   .route('/')
-  .post(createSubCategoryValidator, createSubCategory)
+  .post(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    createSubCategoryValidator,
+    createSubCategory
+  )
   .get(createFilterObj, getAllSubCategories);
 
 router
   .route('/:id')
   .get(getSubCategoryValidator, getSubCategoryById)
-  .patch(updateSubCategoryValidator, updateSubCategory)
-  .delete(deleteSubCategoryValidator, deleteSubCategory);
+  .patch(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    updateSubCategoryValidator,
+    updateSubCategory
+  )
+  .delete(verifyToken, restrictedTo('admin'), deleteSubCategoryValidator, deleteSubCategory);
 
 module.exports = router;

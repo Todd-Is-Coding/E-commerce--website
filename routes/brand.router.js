@@ -17,17 +17,34 @@ const {
   deleteBrandValidator
 } = require('../utils/validators/brandValidators');
 
+const verifyToken = require('../middlewares/verifyToken');
+const restrictedTo = require('../middlewares/restrictedTo');
+
 const router = express.Router();
 
 router
   .route('/')
-  .post(uploadBrandImage, resizeImage, createBrandValidator, createBrand)
+  .post(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    uploadBrandImage,
+    resizeImage,
+    createBrandValidator,
+    createBrand
+  )
   .get(getAllBrands);
 
 router
   .route('/:id')
   .get(getBrandValidator, getBrandById)
-  .patch(uploadBrandImage, resizeImage, updateBrandValidator, updateBrand)
-  .delete(deleteBrandValidator, deleteBrand);
+  .patch(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    uploadBrandImage,
+    resizeImage,
+    updateBrandValidator,
+    updateBrand
+  )
+  .delete(verifyToken, restrictedTo('admin'), deleteBrandValidator, deleteBrand);
 
 module.exports = router;

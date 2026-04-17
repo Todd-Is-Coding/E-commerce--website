@@ -9,13 +9,17 @@ const { uploadSingleImage } = require('../middlewares/uploadImage');
 
 const resizeImage = asyncHandler(async (req, res, next) => {
   const fileName = `category-${uuidv4()}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat('jpeg')
-    .jpeg({ quality: 100 })
-    .toFile(`uploads/categories/${fileName}`); // Removed leading slash
 
-  req.body.image = fileName;
+  if (req.file) {
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat('jpeg')
+      .jpeg({ quality: 100 })
+      .toFile(`uploads/categories/${fileName}`); // Removed leading slash
+
+    req.body.image = fileName;
+  }
+
   next();
 });
 

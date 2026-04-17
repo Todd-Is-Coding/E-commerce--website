@@ -17,17 +17,27 @@ const {
   deleteProductValidator
 } = require('../utils/validators/productValidators');
 
+const verifyToken = require('../middlewares/verifyToken');
+const restrictedTo = require('../middlewares/restrictedTo');
+
 const router = express.Router();
 
 router
   .route('/')
   .get(getAllProducts)
-  .post(uploadProductImages, resizeProductImages, createProductValidator, createProduct);
+  .post(
+    verifyToken,
+    restrictedTo('admin', 'manager'),
+    uploadProductImages,
+    resizeProductImages,
+    createProductValidator,
+    createProduct
+  );
 
 router
   .route('/:id')
   .get(getProductValidator, getProductById)
-  .patch(updateProductValidator, updateProduct)
-  .delete(deleteProductValidator, deleteProduct);
+  .patch(verifyToken, restrictedTo('admin', 'manager'), updateProductValidator, updateProduct)
+  .delete(verifyToken, restrictedTo('admin'), deleteProductValidator, deleteProduct);
 
 module.exports = router;
