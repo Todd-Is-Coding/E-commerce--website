@@ -13,7 +13,7 @@ const verifyToken = async (req, res, next) => {
   token = authHeader.split(' ')[1];
 
   if (!token) {
-    return next(new AppError('Un authorized user', 401));
+    return next(new AppError('Unauthorized user', 401));
   }
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -22,6 +22,10 @@ const verifyToken = async (req, res, next) => {
 
   if (!user || user.active === false) {
     return next(new AppError('User not found or inactive', 401));
+  }
+
+  if (user.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError('User changed the password', 401));
   }
 
   req.user = user;

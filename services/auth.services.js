@@ -36,7 +36,7 @@ const login = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email });
 
-  if (!user || !user.verifyPassword(password)) {
+  if (!user || !(await user.verifyPassword(password))) {
     return next(new AppError('Invalid email or password', 400));
   }
 

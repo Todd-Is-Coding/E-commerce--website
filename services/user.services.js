@@ -2,7 +2,6 @@ const asyncHandler = require('express-async-handler');
 const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 const slugify = require('slugify');
-const bcrypt = require('bcryptjs');
 
 const User = require('../models/user.model');
 const { getOne, getAll, deleteOne, createOne } = require('./factory');
@@ -64,20 +63,14 @@ const updateUser = asyncHandler(async (req, res, next) => {
 
 const changeUserPassword = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-
   const { password } = req.body;
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const user = await User.findById(id);
 
-  const user = await User.findByIdAndUpdate(
-    id,
-    { password: hashedPassword },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
+  user.password = password;
+  await user.save();
+
+  user.password = undefined;
 
   res.status(200).json({
     status: httpStatus.SUCCESS,
