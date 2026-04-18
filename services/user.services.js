@@ -44,7 +44,7 @@ const getLoggedUser = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({
-    status: 'success',
+    status: httpStatus.SUCCESS,
     data: user
   });
 });
@@ -111,6 +111,27 @@ const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
+const updateLoggedUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone
+    },
+    { new: true, runValidators: true }
+  ).select('-password -role -active -slug');
+
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  res.status(200).json({
+    status: httpStatus.SUCCESS,
+    data: user
+  });
+});
+
 const deleteUser = deleteOne(User, {
   modelName: 'User'
 });
@@ -128,6 +149,7 @@ module.exports = {
   createUser,
   changeUserPassword,
   updateLoggedUserPassword,
+  updateLoggedUser,
   resizeImage,
   uploadProfileImage
 };

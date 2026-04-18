@@ -10,7 +10,8 @@ const {
   changeUserPassword,
   updateLoggedUserPassword,
   resizeImage,
-  uploadProfileImage
+  uploadProfileImage,
+  updateLoggedUser
 } = require('../services/user.services');
 
 const {
@@ -39,6 +40,7 @@ router
   );
 
 router.route('/getMe').get(verifyToken, getLoggedUser);
+router.route('/updateMe').patch(verifyToken, updateLoggedUser);
 router.route('/changeMyPassword').patch(verifyToken, updateLoggedUserPassword);
 
 router
