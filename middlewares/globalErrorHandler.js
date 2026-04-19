@@ -7,6 +7,11 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
+  // Check for review compound index violation (user + product)
+  if (err?.message?.includes('user_1_product_1')) {
+    return new AppError('You have already reviewed this product', 400);
+  }
+
   const field = err?.keyValue ? Object.keys(err.keyValue)[0] : undefined;
   const value = err?.keyValue && field ? err.keyValue[field] : undefined;
   const message = field

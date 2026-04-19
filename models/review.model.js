@@ -25,6 +25,41 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Compound unique index: one review per user per product
+reviewSchema.index({ user: 1, product: 1 }, { unique: true });
+
+reviewSchema.statics.calcAverageRatingsAndQuantity = async function (productId) {
+  const stats = await this.aggregate([
+    { $match: { product: productId } },
+    {
+      $group: {
+        _id: '$product',
+        numOfReviews: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+
+  if (stats.length > 0) {
+    await mongoose.model('Product').findByIdAndUpdate(productId, {
+      ratingAverage: stats[0].avgRating,
+      ratingQuantity: stats[0].numOfReviews
+    });
+  } else {
+    await mongoose.model('Product').findByIdAndUpdate(productId, {
+      ratingAverage: 0,
+      ratingQuantity: 0
+    });
+  }
+};
+
+reviewSchema.post('save', async function () {
+  await this.constructor.calcAverageRatingsAndQuantity(this.product);
+});
+
+reviewSchema.post('remove', async function () {
+  await this.constructor.calcAverageRatingsAndQuantity(this.product);
+});
 
 const reviewModel = mongoose.model('Review', reviewSchema);
 

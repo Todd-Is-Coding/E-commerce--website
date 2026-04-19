@@ -8,8 +8,14 @@ const createReviewValidator = [
     .notEmpty()
     .withMessage('rating value required')
     .isFloat({ min: 1, max: 5 })
-    .withMessage('Ratings value must be between 1 to 5'),
-
+    .withMessage('Ratings value must be between 1 to 5')
+    .custom((val, { req }) =>
+      Review.findOne({ user: req.user._id, product: req.params.productId }).then((review) => {
+        if (review) {
+          return Promise.reject(new Error('You have already reviewed this product'));
+        }
+      })
+    ),
   validatorMiddleware
 ];
 
