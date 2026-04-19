@@ -1,5 +1,6 @@
 const { getOne, getAll, updateOne, deleteOne, createOne } = require('./factory');
 const Review = require('../models/review.model');
+const setIdToBody = require('../middlewares/setIdToBody');
 
 const getAllReviews = getAll(Review, {
   modelName: 'Review',
@@ -13,11 +14,12 @@ const getReviewById = getOne(Review, {
 
 const createReview = createOne(Review, {
   modelName: 'Review',
+  preValidate: setIdToBody({ paramName: 'productId', bodyField: 'product' }),
   populate: 'user'
 });
 
 const deleteReview = deleteOne(Review, {
-  modelName: 'Review',
+  modelName: 'Review'
 });
 
 const updateReview = updateOne(Review, {

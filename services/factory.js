@@ -81,7 +81,9 @@ const createOne = (Model, options = {}) => {
   const { preValidate = null, preProcess = null, populate = null } = options;
   return asyncHandler(async (req, res, next) => {
     if (preValidate && typeof preValidate === 'function') {
-      await preValidate(req, next);
+      // preValidate hooks in this factory are synchronous/asynchronous mutators
+      // (e.g., injecting nested route IDs). They should not advance Express flow.
+      await preValidate(req, res);
     }
 
     if (preProcess && typeof preProcess === 'function') {

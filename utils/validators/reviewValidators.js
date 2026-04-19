@@ -1,4 +1,4 @@
-const { check, body } = require('express-validator');
+const { check } = require('express-validator');
 const validatorMiddleware = require('../../middlewares/validation');
 const Review = require('../../models/review.model');
 
@@ -9,18 +9,7 @@ const createReviewValidator = [
     .withMessage('rating value required')
     .isFloat({ min: 1, max: 5 })
     .withMessage('Ratings value must be between 1 to 5'),
-  check('user').isMongoId().withMessage('Invalid Review id format'),
-  check('product')
-    .isMongoId()
-    .withMessage('Invalid Review id format')
-    .custom((val, { req }) =>
-      Review.findOne({ user: req.user._id, product: req.body.product }).then((review) => {
-        console.log(review);
-        if (review) {
-          return Promise.reject(new Error('You already created a review before'));
-        }
-      })
-    ),
+
   validatorMiddleware
 ];
 

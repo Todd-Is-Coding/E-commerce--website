@@ -17,6 +17,8 @@ const {
   deleteProductValidator
 } = require('../utils/validators/productValidators');
 
+const reviewRouter = require('./review.router');
+
 const verifyToken = require('../middlewares/verifyToken');
 const restrictedTo = require('../middlewares/restrictedTo');
 
@@ -33,6 +35,8 @@ router
     createProductValidator,
     createProduct
   );
+
+router.use('/:productId/reviews', reviewRouter);
 
 router
   .route('/:id')

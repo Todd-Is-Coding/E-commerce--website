@@ -17,17 +17,21 @@ const {
 
 const verifyToken = require('../middlewares/verifyToken');
 const restrictedTo = require('../middlewares/restrictedTo');
+const createFilterObj = require('../middlewares/createFilterObj');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use(verifyToken);
 
-router.route('/').get(getAllReviews).post(restrictedTo('user'), createReview);
+router
+  .route('/')
+  .get(createFilterObj('productId', 'product'), getAllReviews)
+  .post(restrictedTo('user'), createReviewValidator, createReview);
 
 router
   .route('/:id')
-  .get(getReviewById)
-  .patch(restrictedTo('user'), updateReview)
-  .delete(restrictedTo('admin', 'manager', 'user'), deleteReview);
+  .get(getReviewValidator, getReviewById)
+  .patch(restrictedTo('user'), updateReviewValidator, updateReview)
+  .delete(restrictedTo('admin', 'manager', 'user'), deleteReviewValidator, deleteReview);
 
 module.exports = router;

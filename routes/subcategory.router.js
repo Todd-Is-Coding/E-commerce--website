@@ -5,8 +5,7 @@ const {
   getSubCategoryById,
   getAllSubCategories,
   deleteSubCategory,
-  updateSubCategory,
-  createFilterObj
+  updateSubCategory
 } = require('../services/subcategory.services');
 
 const {
@@ -18,6 +17,7 @@ const {
 
 const verifyToken = require('../middlewares/verifyToken');
 const restrictedTo = require('../middlewares/restrictedTo');
+const createFilterObj = require('../middlewares/createFilterObj');
 
 const router = express.Router({ mergeParams: true });
 
@@ -29,7 +29,7 @@ router
     createSubCategoryValidator,
     createSubCategory
   )
-  .get(createFilterObj, getAllSubCategories);
+  .get(createFilterObj('categoryId', 'category'), getAllSubCategories);
 
 router
   .route('/:id')
