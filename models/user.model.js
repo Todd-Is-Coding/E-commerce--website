@@ -42,7 +42,14 @@ const userSchema = new mongoose.Schema(
     passwordResetExpires: { type: Date, select: false },
     passwordResetVerified: { type: Boolean, select: false },
     tempResetTokenExpires: { type: Date, select: false },
-    tempResetToken: { type: String, select: false }
+    tempResetToken: { type: String, select: false },
+    // child refrence 1 to Many
+    wishlist: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product'
+      }
+    ]
   },
   {
     timestamps: true

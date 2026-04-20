@@ -17,6 +17,7 @@ const productRouter = require('./routes/product.router');
 const userRouter = require('./routes/user.router');
 const authRouter = require('./routes/auth.router');
 const reviewRouter = require('./routes/review.router');
+const wishlistRouter = require('./routes/wishlist.router');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 const NotFoundHandler = require('./middlewares/notFoundHandler');
@@ -39,6 +40,7 @@ app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/wishlists', wishlistRouter);
 
 app.use(NotFoundHandler);
 
