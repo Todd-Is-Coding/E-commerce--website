@@ -49,6 +49,16 @@ const userSchema = new mongoose.Schema(
         type: mongoose.Schema.ObjectId,
         ref: 'Product'
       }
+    ],
+    addresses: [
+      {
+        id: { type: mongoose.Schema.Types.ObjectId },
+        details: String,
+        phone: String,
+        alias: String,
+        postalCode: String,
+        city: String
+      }
     ]
   },
   {
