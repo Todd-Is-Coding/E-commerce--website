@@ -34,6 +34,7 @@ const getBrandById = getOne(Brand, {
 });
 
 const createBrand = createOne(Brand, {
+  modelName: 'Brand',
   preProcess: addSlug
 });
 

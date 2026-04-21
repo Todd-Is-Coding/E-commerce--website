@@ -22,13 +22,7 @@ const getOne = (Model, options = {}) => {
     let query = Model.findById(id);
 
     if (populate) {
-      if (Array.isArray(populate)) {
-        populate.forEach((field) => {
-          query = query.populate(field);
-        });
-      } else {
-        query = query.populate(populate);
-      }
+      query = query.populate(populate);
     }
 
     const document = await query;
@@ -57,13 +51,7 @@ const updateOne = (Model, options = {}) => {
     });
 
     if (populate) {
-      if (Array.isArray(populate)) {
-        populate.forEach((field) => {
-          query = query.populate(field);
-        });
-      } else {
-        query = query.populate(populate);
-      }
+      query = query.populate(populate);
     }
 
     const document = await query;
@@ -93,13 +81,7 @@ const createOne = (Model, options = {}) => {
     let newDoc = await Model.create(req.body);
 
     if (populate) {
-      if (Array.isArray(populate)) {
-        for (const field of populate) {
-          newDoc = await newDoc.populate(field);
-        }
-      } else {
-        newDoc = await newDoc.populate(populate);
-      }
+      newDoc = await newDoc.populate(populate);
     }
 
     res.status(201).json({
@@ -128,13 +110,7 @@ const getAll = (Model, options = {}) => {
     let { mongoQuery, paginationResult } = apiFeatures;
 
     if (populate) {
-      if (Array.isArray(populate)) {
-        populate.forEach((field) => {
-          mongoQuery = mongoQuery.populate(field);
-        });
-      } else {
-        mongoQuery = mongoQuery.populate(populate);
-      }
+      mongoQuery = mongoQuery.populate(populate);
     }
 
     const documents = await mongoQuery;
