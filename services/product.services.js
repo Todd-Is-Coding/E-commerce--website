@@ -87,13 +87,11 @@ const getProductById = getOne(Product, {
 
 const createProduct = createOne(Product, {
   preProcess: processProductData,
-  populate: ['category', 'subcategory']
 });
 
 const updateProduct = updateOne(Product, {
   modelName: 'Product',
   preProcess: processProductData,
-  populate: ['category', 'subcategory']
 });
 
 const deleteProduct = deleteOne(Product, {

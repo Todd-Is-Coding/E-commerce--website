@@ -11,7 +11,6 @@ const processSubCategoryData = (data) => {
 const createSubCategory = createOne(SubCategory, {
   preValidate: setIdToBody('categoryId', 'category'),
   preProcess: processSubCategoryData,
-  populate: 'category'
 });
 
 const getSubCategoryById = getOne(SubCategory, {
@@ -21,13 +20,11 @@ const getSubCategoryById = getOne(SubCategory, {
 
 const getAllSubCategories = getAll(SubCategory, {
   modelName: 'Subcategory',
-  populate: 'category'
 });
 
 const updateSubCategory = updateOne(SubCategory, {
   modelName: 'Subcategory',
   preProcess: processSubCategoryData,
-  populate: 'category'
 });
 
 const deleteSubCategory = deleteOne(SubCategory, {

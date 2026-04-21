@@ -1,3 +1,6 @@
+
+//Builder Pattern
+
 class ApiFeatures {
   constructor(mongoQuery, queryString) {
     this.mongoQuery = mongoQuery;

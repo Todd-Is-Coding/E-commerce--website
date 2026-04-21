@@ -1,3 +1,5 @@
+// Singleton Pattern "I have implicitly applied it through mongoose"
+
 const mongoose = require('mongoose');
 
 const { configureMongoSecurity } = require('./security');

@@ -51,6 +51,10 @@ const getLoggedUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+/**
+ * ProtoType Pattern
+ */
 const updateUser = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 

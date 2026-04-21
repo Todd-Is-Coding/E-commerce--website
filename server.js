@@ -19,6 +19,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
   logger.info(`Mode : ${process.env.NODE_ENV}`);
 }
+/**
+ * this is CHAIN OF RESPONSIBILITY DESIGN PATTERN
+ */
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'uploads')));

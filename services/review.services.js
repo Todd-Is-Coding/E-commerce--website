@@ -15,7 +15,6 @@ const getReviewById = getOne(Review, {
 const createReview = createOne(Review, {
   modelName: 'Review',
   preValidate: setIdToBody({ paramName: 'productId', bodyField: 'product' }),
-  populate: 'user'
 });
 
 const deleteReview = deleteOne(Review, {
@@ -24,7 +23,6 @@ const deleteReview = deleteOne(Review, {
 
 const updateReview = updateOne(Review, {
   modelName: 'Review',
-  populate: 'user'
 });
 
 module.exports = {

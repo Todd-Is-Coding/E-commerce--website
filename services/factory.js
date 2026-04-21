@@ -3,6 +3,20 @@ const httpStatus = require('../utils/httpStatus');
 const asyncHandler = require('express-async-handler');
 const ApiFeatures = require('../utils/apiFeatures');
 
+/**
+ *
+ * This is a FACTORY DESIGN PATTERN 
+ *  Why it's called “partial Factory”
+
+        Because you only implemented ONE part of the factory idea:
+        
+        Factory Concept	Did you do it?
+        Encapsulate creation logic	 partially
+        Return different object types	 no
+        Decide object at runtime	 no
+        Abstract instantiation	 partial (wrappers only)
+ * AND Repository Pattern via Mongoose Queries
+ */
 const deleteOne = (Model, options = {}) => {
   const { modelName = 'document' } = options;
   return asyncHandler(async (req, res, next) => {

@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 const emailConfig = require('../config/emailConfig');
 const logger = require('../utils/logger');
 
+/**
+ * Singleton Design patter partial usage
+ */
 const transporter = nodemailer.createTransport({
   host: emailConfig.SMTP_HOST,
   port: Number(emailConfig.SMTP_PORT),
