@@ -7,6 +7,8 @@ const Product = require('../models/product.model');
 const AppError = require('../utils/appError');
 const httpStatus = require('../utils/httpStatus');
 
+const factory = require('./factory');
+
 const createCashOrder = asyncHandler(async (req, res, next) => {
   // 1) find cart
   const cart = await Cart.findOne({ user: req.user._id });
@@ -37,7 +39,7 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // 3) calculate total price 
+  // 3) calculate total price
   const totalOrderPrice = cart.priceAfterDiscount || cart.totalCartPrice;
 
   // 4) create Order
@@ -76,10 +78,41 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
   });
 });
 
+const filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
+  if (req.user.role === 'user') req.filterObj = { user: req.user._id };
+  next();
+});
 
+const getAllOrders = factory.getAll(Order, {
+  modelName: 'Order'
+});
 
+const getSpecificOrder = factory.getOne(Order, {
+  modelName: 'Order'
+});
 
+const updateOrderPaidStatusToPaid = asyncHandler(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
 
+  if (!order) {
+    return next(new AppError('no found order', 404));
+  }
 
+  order.isPaid = true;
+  order.paidAt = Date.now();
 
-module.exports = { createCashOrder };
+  const updatedOrder = await order.save();
+
+  res.status(200).json({
+    status: httpStatus.SUCCESS,
+    data: updatedOrder
+  });
+});
+
+module.exports = {
+  createCashOrder,
+  filterOrderForLoggedUser,
+  getSpecificOrder,
+  getAllOrders,
+  updateOrderPaidStatusToPaid
+};

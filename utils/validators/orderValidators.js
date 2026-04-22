@@ -3,6 +3,13 @@ const mongoose = require('mongoose');
 const validatorMiddleware = require('../../middlewares/validation');
 
 const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(value);
+const mongoIdParam = (fieldName) =>
+  param(fieldName).custom((value) => {
+    if (!isValidObjectId(value)) {
+      throw new Error(`Invalid ${fieldName} format`);
+    }
+    return true;
+  });
 
 const createCashOrderValidator = [
   body('shippingAddress')
@@ -44,6 +51,12 @@ const createCashOrderValidator = [
   validatorMiddleware
 ];
 
+const getSpecificOrderValidator = [mongoIdParam('id'), validatorMiddleware];
+
+const updateOrderPaidStatusValidator = [mongoIdParam('id'), validatorMiddleware];
+
 module.exports = {
-  createCashOrderValidator
+  createCashOrderValidator,
+  getSpecificOrderValidator,
+  updateOrderPaidStatusValidator
 };
