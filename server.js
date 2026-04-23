@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 
 const { connectDatabase } = require('./config/db');
 const { verifyEmailConnection } = require('./utils/sendEmail');
@@ -26,15 +27,25 @@ if (process.env.NODE_ENV === 'development') {
  * this is CHAIN OF RESPONSIBILITY DESIGN PATTERN
  */
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use(cors());
 app.use(compression());
 app.use(
   express.json({
-    verify: stripeWebhookBody
+    verify: stripeWebhookBody,
+    limit: '10kb'
   })
 );
 app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use('/api', limiter);
 
 mountRoutes(app);
 app.use(NotFoundHandler);

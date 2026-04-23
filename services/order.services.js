@@ -112,59 +112,6 @@ const updateOrderPaidStatusToPaid = asyncHandler(async (req, res, next) => {
   });
 });
 
-const createCardOrder = async (session) => {
-  const cartId = session.client_reference_id;
-  const shippingAddress = session.metadata;
-  const orderPrice = session.amount_total / 100;
-
-  const cart = await Cart.findById(cartId);
-  if (!cart) return;
-
-  const user = await User.findOne({ email: session.customer_email });
-  if (!user) return;
-
-  const order = await Order.create({
-    user: user._id,
-    cartItems: cart.cartItems,
-    shippingAddress,
-    totalOrderPrice: orderPrice,
-    isPaid: true,
-    paidAt: Date.now(),
-    paymentMethodType: 'card'
-  });
-
-  if (order) {
-    const bulkOptions = cart.cartItems.map((item) => ({
-      updateOne: {
-        filter: { _id: item.product },
-        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
-      }
-    }));
-
-    await Product.bulkWrite(bulkOptions);
-    await Cart.findByIdAndDelete(cartId);
-  }
-};
-
-const webhookCheckout = asyncHandler(async (req, res) => {
-  const signature = req.headers['stripe-signature'];
-  const payload = req.rawBody || req.body;
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(payload, signature, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  if (event.type === 'checkout.session.completed') {
-    await createCardOrder(event.data.object);
-  }
-
-  res.status(200).json({ received: true });
-});
-
 const checkoutSession = asyncHandler(async (req, res, next) => {
   const cart = await Cart.findOne({
     _id: req.params.cartId,
@@ -234,6 +181,59 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
     status: httpStatus.SUCCESS,
     data: session
   });
+});
+
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const orderPrice = session.amount_total / 100;
+
+  const cart = await Cart.findById(cartId);
+  if (!cart) return;
+
+  const user = await User.findOne({ email: session.customer_email });
+  if (!user) return;
+
+  const order = await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: 'card'
+  });
+
+  if (order) {
+    const bulkOptions = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+      }
+    }));
+
+    await Product.bulkWrite(bulkOptions);
+    await Cart.findByIdAndDelete(cartId);
+  }
+};
+
+const webhookCheckout = asyncHandler(async (req, res) => {
+  const signature = req.headers['stripe-signature'];
+  const payload = req.rawBody || req.body;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(payload, signature, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    await createCardOrder(event.data.object);
+  }
+
+  res.status(200).json({ received: true });
 });
 
 module.exports = {
