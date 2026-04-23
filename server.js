@@ -6,7 +6,11 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
+const hpp = require('hpp');
+const sanitizeMiddleware = require('./middlewares/sanitizeMiddlerware');
+
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const { connectDatabase } = require('./config/db');
 const { verifyEmailConnection } = require('./utils/sendEmail');
@@ -44,8 +48,11 @@ app.use(
   })
 );
 app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(hpp());
+app.use(mongoSanitize());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use('/api', limiter);
+app.use('/api', sanitizeMiddleware);
 
 mountRoutes(app);
 app.use(NotFoundHandler);
