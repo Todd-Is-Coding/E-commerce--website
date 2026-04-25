@@ -1,5 +1,40 @@
 # E-Commerce Backend API
 
+## Table of Contents
+
+- [1. Project Overview](#1-project-overview)
+- [2. Tech Stack](#2-tech-stack)
+- [3. Architecture](#3-architecture)
+- [4. Folder Structure](#4-folder-structure)
+- [5. Features](#5-features)
+- [6. API Documentation](#6-api-documentation-complete)
+  - [Auth Routes](#auth-routes)
+  - [User Routes](#user-routes)
+  - [Category Routes](#category-routes)
+  - [Subcategory Routes](#subcategory-routes)
+  - [Brand Routes](#brand-routes)
+  - [Product Routes](#product-routes)
+  - [Review Routes](#review-routes)
+  - [Wishlist Routes](#wishlist-routes)
+  - [Address Routes](#address-routes)
+  - [Coupon Routes](#coupon-routes)
+  - [Cart Routes](#cart-routes)
+  - [Order Routes](#order-routes)
+  - [Payment Routes](#payment-routes)
+- [7. Security & Middleware](#7-security--middleware)
+- [8. Performance Analysis](#8-performance-analysis-jmeter-style-simulation)
+- [9. Why Performance Analysis is Important](#9-why-performance-analysis-is-important)
+- [10. Design Patterns Used](#10-design-patterns-used)
+  - [Factory Pattern](#factory-pattern)
+  - [Builder Pattern](#builder-pattern)
+  - [Middleware Pattern](#middleware-pattern)
+  - [Chain of Responsibility Pattern](#chain-of-responsibility-pattern)
+  - [Singleton Pattern](#singleton-pattern)
+  - [MVC Pattern](#mvc-pattern-model-view-controller)
+- [11. Setup Instructions](#11-setup-instructions)
+
+---
+
 ## 1. Project Overview
 
 This project is a Node.js and Express backend for an e-commerce platform. It exposes a REST API for authentication, user management, product catalog management, category and brand organization, reviews, wishlist management, address book management, shopping cart workflows, coupon handling, cash-on-delivery orders, and Stripe-powered card checkout.
