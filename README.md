@@ -31,6 +31,7 @@
   - [Chain of Responsibility Pattern](#chain-of-responsibility-pattern)
   - [Singleton Pattern](#singleton-pattern)
   - [MVC Pattern](#mvc-pattern-model-view-controller)
+    - [Observer Pattern](#observer-pattern)
 - [11. Testing](#11-testing)
 - [12. Setup Instructions](#12-setup-instructions)
 
@@ -988,6 +989,269 @@ The MVC pattern separates concerns: Models define data structure and validation,
 - Layer indirection - Simple operations may require changes across multiple layers
 - Service layer ambiguity - The line between controller logic and service logic can blur
 - No traditional view layer - JSON responses are generated inline in services, which could be separated further
+
+---
+
+### Observer Pattern
+
+This project uses the Observer Pattern in a set of framework-level and application-level places to implement decoupled reactions to lifecycle events and external events. All usages below are confirmed from source code (Mongoose middleware, Node process events, and a Stripe webhook handler).
+
+- **Review aggregation (Mongoose hooks)**
+
+```javascript
+// review.model.js
+reviewSchema.statics.calcAverageRatingsAndQuantity = async function (productId) {
+  const stats = await this.aggregate([
+    { $match: { product: productId } },
+    {
+      $group: {
+        _id: '$product',
+        numOfReviews: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+
+  if (stats.length > 0) {
+    await mongoose.model('Product').findByIdAndUpdate(productId, {
+      ratingAverage: stats[0].avgRating,
+      ratingQuantity: stats[0].numOfReviews
+    });
+  } else {
+    await mongoose.model('Product').findByIdAndUpdate(productId, {
+      ratingAverage: 0,
+      ratingQuantity: 0
+    });
+  }
+};
+
+reviewSchema.post('save', async function () {
+  await this.constructor.calcAverageRatingsAndQuantity(this.product);
+});
+
+reviewSchema.post('remove', async function () {
+  await this.constructor.calcAverageRatingsAndQuantity(this.product);
+});
+```
+
+- **Subject / Publisher:** `Review` model — observes `post('save')` and `post('remove')` and updates `Product` aggregation.
+
+- **User password hashing (Mongoose pre-save)**
+
+```javascript
+// user.model.js
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(this.password, salt);
+  this.password = hashedPassword;
+  if (!this.isNew) {
+    this.passwordChangedAt = new Date(Date.now() - 1000);
+  }
+});
+```
+
+- **Subject / Publisher:** `User` model — observes `pre('save')` to enforce secure storage of passwords.
+
+- **Image URL transformation (post init/save hooks)**
+
+```javascript
+// product.model.js (example)
+const setImageURL = (doc) => {
+  if (doc.imageCover) {
+    const imageURL = `${process.env.BASE_URL}/products/${doc.imageCover}`;
+    doc.imageCover = imageURL;
+  }
+  if (doc.images) {
+    const imageList = [];
+    doc.images.forEach((image) => {
+      const imageURL = `${process.env.BASE_URL}/products/${image}`;
+      imageList.push(imageURL);
+    });
+    doc.images = imageList;
+  }
+};
+
+productSchema.post('init', (doc) => {
+  setImageURL(doc);
+});
+
+productSchema.post('save', (doc) => {
+  setImageURL(doc);
+});
+```
+
+```javascript
+// brand.model.js (simpler example)
+const setImageURL = (doc) => {
+  if (doc.image) {
+    doc.image = `${process.env.BASE_URL}/brands/${doc.image}`;
+  }
+};
+
+brandSchema.post('init', (doc) => setImageURL(doc));
+brandSchema.post('save', (doc) => setImageURL(doc));
+```
+
+```javascript
+// category.model.js
+const setImageURL = (doc) => {
+  if (doc.image) {
+    doc.image = `${process.env.BASE_URL}/categories/${doc.image}`;
+  }
+};
+
+categorySchema.post('init', (doc) => setImageURL(doc));
+categorySchema.post('save', (doc) => setImageURL(doc));
+```
+
+- **Subject / Publisher:** `Product`, `Brand`, `Category` models — observe `post('init')` and `post('save')` to map file names to public URLs.
+
+- **Cart population (post-save)**
+
+```javascript
+// cart.model.js
+cartSchema.post('save', async function (doc) {
+  await doc.populate({
+    path: 'cartItems.product',
+    select: 'title price priceAfterDiscount imageCover description'
+  });
+});
+```
+
+- **Subject / Publisher:** `Cart` model — observes `post('save')` to auto-populate referenced `product` data.
+
+- **Order query population (pre-find)**
+
+```javascript
+// order.model.js
+orderSchema.pre(/^find/, function () {
+  this.populate({
+    path: 'user',
+    select: 'name profileImg email phone'
+  }).populate({
+    path: 'cartItems.product',
+    select: 'title imageCover '
+  });
+});
+```
+
+- **Subject / Publisher:** `Order` model — observes `pre(/^find/)` to ensure related `user` and `product` fields are populated for reads.
+
+- **Global process event handlers**
+
+```javascript
+// server.js
+process.on('uncaughtException', (err) => {
+  logger.fatal('uncaught_exception', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack
+  });
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+
+  logger.fatal('unhandled_rejection', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack
+  });
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+```
+
+- **Subject / Publisher:** Node `process` — global observers for runtime failures.
+
+- **Stripe webhook handler (external event → internal reaction)**
+
+```javascript
+// middlewares/stripeWebhookBody.js
+const stripeWebhookBody = (req, res, buf) => {
+  if (req.originalUrl === '/api/v1/orders/webhook-checkout') {
+    req.rawBody = buf;
+  }
+};
+
+module.exports = stripeWebhookBody;
+```
+
+```javascript
+// services/order.services.js (relevant parts)
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const orderPrice = session.amount_total / 100;
+
+  const cart = await Cart.findById(cartId);
+  if (!cart) return;
+
+  const user = await User.findOne({ email: session.customer_email });
+  if (!user) return;
+
+  const order = await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: 'card'
+  });
+
+  if (order) {
+    const bulkOptions = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+      }
+    }));
+
+    await Product.bulkWrite(bulkOptions);
+    await Cart.findByIdAndDelete(cartId);
+  }
+};
+
+const webhookCheckout = asyncHandler(async (req, res) => {
+  const signature = req.headers['stripe-signature'];
+  const payload = req.rawBody || req.body;
+
+  let event;
+
+  try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    await createCardOrder(event.data.object);
+  }
+
+  res.status(200).json({ received: true });
+});
+```
+
+- **Subject / Publisher:** External Stripe webhooks — server reacts by creating orders and reconciling inventory.
+
+If no additional event-driven mechanisms are detected (message queues, internal EventEmitter buses, pub/sub systems, background workers, or notification listeners), the codebase relies primarily on framework-level Observer semantics (Mongoose lifecycle hooks and Node process events) plus explicit webhook handling for external events.
 
 ---
 
